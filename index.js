@@ -24,7 +24,10 @@ sequelize
   .authenticate()
   .then(() => {
     console.log("✅ Connected to database");
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT;
+    if (!PORT) {
+      throw new Error("❌ process.env.PORT is undefined. Railway needs PORT to be defined.");
+    }
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
