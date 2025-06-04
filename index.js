@@ -25,12 +25,15 @@ sequelize
   .then(() => {
     console.log("✅ Connected to database");
     const PORT = process.env.PORT;
+    
     if (!PORT) {
-      throw new Error("❌ process.env.PORT is undefined. Railway needs PORT to be defined.");
+      throw new Error("❌ Railway PORT is not set!");
     }
+    
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
+
   })
   .catch((err) => {
     console.error("❌ Unable to connect to the database:", err.message);
