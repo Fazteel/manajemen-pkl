@@ -10,11 +10,7 @@ const app = express();
 const cors = require("cors");
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.send("✅ API is up and running");
-});
 app.use("/api", authRoutes);
 app.use("/api", attendanceRoutes);
 app.use("/api", vacancyRoute);
