@@ -1,37 +1,31 @@
 // scripts/createAdmin.js
+'use strict';
 
-const readline = require('readline');
-const bcrypt = require('bcrypt'); // pastikan ini mengarah ke model User kamu
+const bcrypt = require('bcrypt');
 require('dotenv').config();
-const { sequelize, User } = require('./src/models'); // pastikan ini mengarah ke config sequelize
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-const ask = (question) => {
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => resolve(answer));
-  });
-};
+const { sequelize, User } = require('./src/models'); // pastikan path ini benar
 
 (async () => {
   try {
     await sequelize.authenticate();
     console.log('Connected to DB.');
 
-    const name = await ask('Nama admin: ');
-    const email = await ask('Email admin: ');
-    const password = await ask('Password admin: ');
+    // Admin data langsung tertulis di sini
+    const name = 'Fahmi';
+    const email = 'fahmiandika31@gmail.com';
+    const plainPassword = 'Antares19';
 
+    // Cek jika email sudah dipakai
     const existing = await User.findOne({ where: { email } });
     if (existing) {
-      console.log('Email sudah digunakan.');
-      return rl.close();
+      console.log('Email sudah digunakan. Tidak membuat ulang akun.');
+      return;
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    // Hash password
+    const hashed = await bcrypt.hash(plainPassword, 10);
+
+    // Buat admin baru
     const admin = await User.create({
       name,
       email,
@@ -42,9 +36,9 @@ const ask = (question) => {
     console.log('Akun admin berhasil dibuat:');
     console.log(`ID: ${admin.id}`);
     console.log(`Email: ${admin.email}`);
-    rl.close();
   } catch (err) {
     console.error('Gagal membuat admin:', err.message);
-    rl.close();
+  } finally {
+    await sequelize.close();
   }
 })();
