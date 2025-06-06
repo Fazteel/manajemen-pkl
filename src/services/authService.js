@@ -1,5 +1,5 @@
 const { User } = require('../models/index');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { generateOtp, verifyOtp, storeOtp, generateResetToken, sendSetPasswordEmail } = require('../utils/helper');
@@ -49,6 +49,13 @@ exports.login = async ({ email, password }) => {
   const token = createToken(user);
   return { token, user };
 };
+
+exports.profile = async (userId) => {
+  const user = await User.findOne({ where: { id: userId } });
+  if (!user) throw new Error('User not found');
+
+  return user;
+}
 
 exports.setPassword = async (token, password) => {
   const user = await User.findOne({

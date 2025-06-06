@@ -52,6 +52,7 @@ exports.generateOtp = () => {
 };
 
 exports.storeOtp = async (email, otp) => {
+  const resetUrl = `https://manajemen-pkl-production.up.railway.app/api/auth/reset-password?email=${encodeURIComponent(email)}`;
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.com",
@@ -216,7 +217,7 @@ exports.storeOtp = async (email, otp) => {
               </div>
 
               <div class="button-container">
-                <a href="#" class="button">Reset Password Anda</a>
+                <a href="${resetUrl}" class="button">Reset Password Anda</a>
               </div>
             </div>
             <div class="footer">
