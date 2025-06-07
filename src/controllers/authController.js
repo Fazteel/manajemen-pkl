@@ -22,29 +22,6 @@ exports.createUser = async (req, res) => {
   }
 };
 
-exports.userProfile = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const userProfile = await authService.profile(userId);
-    res.status(200).json({
-      error: false,
-      status: 200,
-      message: 'Get Profile successfullt',
-      data: {
-        userProfile
-      }
-    });
-  } catch (error) {
-    res.status(200).json({
-      error: false,
-      status: 200,
-      message: error.message,
-      data: null
-    });
-    
-  }
-}
-
 exports.login = async (req, res) => {
   try {
     const { token, user } = await authService.login(req.body);

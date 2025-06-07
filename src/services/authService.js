@@ -1,5 +1,5 @@
 const { User } = require('../models/index');
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { generateOtp, verifyOtp, storeOtp, generateResetToken, sendSetPasswordEmail } = require('../utils/helper');
@@ -7,36 +7,6 @@ const getRedisClient = require('../utils/redisClinet');
 
 const createToken = (user) => {
   return jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-};
-
-exports.createUsers = async ({name, email, password, role}, createdBy) => {
-  const existing = await User.findOne({ where: { email } });
-  if (existing) throw new Error('Email already exist');
-
-  const allowedRoles = ['guru', 'siswa'];
-  if (!allowedRoles.includes(role)) throw new Error('Invalid role');
-
-  const token = generateResetToken();
-  const tokenExpire = new Date(Date.now() + 1000 * 60 * 60 * 2);
-
-  const user = await User.create({
-      name,
-      email,
-      password: null,
-      role,
-      created_by: createdBy,
-      reset_password_token: token,
-      reset_token_expire: tokenExpire
-  });
-  await sendSetPasswordEmail(email, name, token);
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    reset_password_token: token,
-    reset_token_expire: tokenExpire
-  };
 };
 
 exports.login = async ({ email, password }) => {
@@ -49,13 +19,6 @@ exports.login = async ({ email, password }) => {
   const token = createToken(user);
   return { token, user };
 };
-
-exports.profile = async (userId) => {
-  const user = await User.findOne({ where: { id: userId } });
-  if (!user) throw new Error('User not found');
-
-  return user;
-}
 
 exports.setPassword = async (token, password) => {
   const user = await User.findOne({
