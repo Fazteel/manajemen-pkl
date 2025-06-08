@@ -1,5 +1,6 @@
 const { where, Op } = require("sequelize");
 const { User } = require("../models/index");
+const {generateResetToken, sendSetPasswordEmail} = require('../utils/helper')
 
 exports.createUsers = async ({ name, email, password, role }, createdBy) => {
   const existing = await User.findOne({ where: { email } });
