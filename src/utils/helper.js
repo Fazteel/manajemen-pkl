@@ -17,7 +17,7 @@ exports.generateQrCode = () => {
 }
 
 exports.sendSetPasswordEmail = async (email, name, token) => {
-  const link = `simaku://set-password?token=${token}`; 
+  const link = `https://manajemen-pkl-production.up.railway.app/api/auth/set-password?token=${token}`; 
   const transporter = nodemailer.createTransport({
     host: "smtp.zoho.com",
     port: 465,
