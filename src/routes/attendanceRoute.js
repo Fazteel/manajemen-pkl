@@ -5,6 +5,7 @@ const {authenticate, checkRole} = require('../middleware/authMiddleware')
 
 router.post("/attendance/generate-qr", authenticate, checkRole('admin'), attendanceController.generateQr);
 router.get("/attendance/", authenticate, checkRole('admin'), attendanceController.getAllAttendance);
+router.get("/attendance/leaderboard-today", authenticate, attendanceController.leaderboard);
 router.get("/attendance/me", authenticate, attendanceController.getMyAttendance);
 router.get("/attendance/user/:id", authenticate, checkRole('admin'), attendanceController.getAttendanceByUserId);
 router.post("/attendance/check_in", authenticate, attendanceController.checkIn);
