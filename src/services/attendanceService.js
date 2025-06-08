@@ -140,6 +140,31 @@ exports.getAllAttendance = async () => {
   return records;
 };
 
+exports.getTodaysLeaderboard = async () => {
+  const today = new Date().toISOString().split('T')[0];
+
+  const leaderboardData = await Attendance.findAll({
+    where: {
+      tanggal: today,
+      keterangan: 'Hadir',
+      check_in: {
+        [Op.ne]: null
+      }
+    },
+    include: {
+      model: User,
+      attributes: ['name'], 
+      required: true
+    },
+    order: [
+      ['check_in', 'ASC']
+    ],
+    attributes: ['id', 'check_in']
+  });
+
+  return leaderboardData;
+};
+
 exports.permit = async (userId, keterangan, alasan) => {
   const allowedTypes = ["sakit", "izin"];
   if (!allowedTypes.includes(keterangan)) {

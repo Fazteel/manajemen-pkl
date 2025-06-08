@@ -73,6 +73,23 @@ exports.getAllAttendance = async (req, res) => {
   }
 };
 
+exports.leaderboard = async (req, res) => {
+  try {
+    const leaderboardData = await attendanceService.getTodaysLeaderboard();
+    res.status(200).json({
+      error: false,
+      message: 'Leaderboard data fetched successfully',
+      data: leaderboardData,
+    });
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    res.status(500).json({
+      error: true,
+      message: 'Internal Server Error',
+    });
+  }
+}
+
 exports.getAttendanceByUserId = async (req, res) => {
   try {
     const userId = req.params.id;
