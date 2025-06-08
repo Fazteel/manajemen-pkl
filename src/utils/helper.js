@@ -7,17 +7,18 @@ exports.generateResetToken = () => {
 };
 
 exports.generateQrCode = () => {
-    const payload = {
+  const payload = {
     type,
     tanggal: new Date().toISOString().split("T")[0],
-    secret: this.generateResetToken()
+    secret: this.generateResetToken(),
   };
 
   return payload;
-}
+};
 
 exports.sendSetPasswordEmail = async (email, name, token) => {
-  const link = `simaku://set-password?token=${token}`; 
+  const frontendUrl = "https://fazteel.github.io/simaku-cms/#";
+  const link = `${frontendUrl}/set-password?token=${token}`;
   const transporter = nodemailer.createTransport({
     host: "smtp.zoho.com",
     port: 465,
@@ -52,7 +53,9 @@ exports.generateOtp = () => {
 };
 
 exports.storeOtp = async (email, otp) => {
-  const resetUrl = `https://manajemen-pkl-production.up.railway.app/api/auth/reset-password?email=${encodeURIComponent(email)}`;
+  const resetUrl = `https://manajemen-pkl-production.up.railway.app/api/auth/reset-password?email=${encodeURIComponent(
+    email
+  )}`;
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.com",
@@ -253,12 +256,12 @@ exports.verifyOtp = async (email, inputOtp) => {
   const savedOtp = await redis.get(key);
 
   if (!savedOtp) {
-    console.log('[OTP VERIFY] OTP not found or expired');
+    console.log("[OTP VERIFY] OTP not found or expired");
     return false;
   }
 
   const isValid = String(savedOtp) === String(inputOtp);
-  console.log('[OTP VERIFY] isValid:', isValid);
+  console.log("[OTP VERIFY] isValid:", isValid);
   return isValid;
 };
 
@@ -269,13 +272,13 @@ exports.setOtp = async (email, otp) => {
 
 exports.markOtpVerified = async (email) => {
   const redis = await getRedisClient();
-  await redis.set(`otp_verified:${email}`, 'true', { EX: 600 }); // valid selama 10 menit
+  await redis.set(`otp_verified:${email}`, "true", { EX: 600 }); // valid selama 10 menit
 };
 
 exports.checkOtpVerified = async (email) => {
   const redis = await getRedisClient();
   const isVerified = await redis.get(`otp_verified:${email}`);
-  return isVerified === 'true';
+  return isVerified === "true";
 };
 
 exports.clearOtpData = async (email) => {
