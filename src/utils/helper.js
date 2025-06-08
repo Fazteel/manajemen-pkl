@@ -19,6 +19,7 @@ exports.generateQrCode = () => {
 exports.sendSetPasswordEmail = async (email, name, token) => {
   const frontendUrl = "https://fazteel.github.io/simaku-cms/#";
   const link = `${frontendUrl}/set-password?token=${token}`;
+  
   const transporter = nodemailer.createTransport({
     host: "smtp.zoho.com",
     port: 465,
