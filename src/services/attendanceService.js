@@ -1,6 +1,6 @@
 const QRCode = require("qrcode");
 const { v4: uuidv4 } = require("uuid");
-const { Op } = require('sequelize');
+const { Op } = require("sequelize");
 const { Attendance, QrCode, User } = require("../models/index");
 
 exports.generateQr = async (userId) => {
@@ -128,6 +128,9 @@ exports.getAttendanceByUserId = async (userId) => {
 
 exports.getAllAttendance = async () => {
   const records = await Attendance.findAll({
+    attributes: {
+      exclude: ["createdAt", "updatedAt"],
+    },
     include: {
       model: User,
       attributes: ["id", "name", "email"],
