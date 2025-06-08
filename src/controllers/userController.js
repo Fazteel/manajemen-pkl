@@ -40,3 +40,50 @@ exports.getAllUsers = async (req, res) => {
     });
   }
 };
+
+exports.update = async (req, res) => {
+  if ("email" in req.body || "password" in req.body) {
+    return res.status(400).json({
+      error: true,
+      status: 400,
+      message: "Email and password cannot be updated through this endpoint.",
+      data: null,
+    });
+  }
+
+  try {
+    const result = await userService.update(req.params.id, req.body);
+    res.status(200).json({
+      error: false,
+      status: 200,
+      message: "OK - User updated successfully",
+      data: result,
+    });
+  } catch (err) {
+    res.status(400).json({
+      error: true,
+      status: 400,
+      message: "Bad Request - " + err.message,
+      data: null,
+    });
+  }
+};
+
+exports.delete = async (req, res) => {
+  try {
+    const result = await userService.delete(req.params.id, req.user.id);
+    res.status(200).json({
+      error: false,
+      status: 200,
+      message: "OK - User delete successfully",
+      data: result
+    });
+  } catch (err) {
+    res.status(403).json({
+      error: true,
+      status: 403,
+      message: "Forbidden - " + err.message,
+      data: null
+    });
+  }
+};
