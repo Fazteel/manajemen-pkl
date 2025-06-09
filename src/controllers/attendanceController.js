@@ -17,6 +17,29 @@ exports.generateQr = async (req, res) => {
   }
 };
 
+exports.getQrCode = async (req, res) => {
+  try {
+    const qrCode = await attendanceService.getLatestQrCode();
+    if (!qrCode) {
+      return res.status(404).json({
+        error: true,
+        message: 'Belum ada QR Code yang pernah dibuat.',
+      });
+    }
+    res.status(200).json({
+      error: false,
+      message: 'QR Code terakhir berhasil diambil',
+      data: qrCode,
+    });
+  } catch (error) {
+    console.error("Error fetching latest QR code:", error);
+    res.status(500).json({
+      error: true,
+      message: 'Internal Server Error',
+    });
+  }
+}
+
 exports.checkIn = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -58,16 +81,27 @@ exports.getMyAttendance = async (req, res) => {
   try {
     const userId = req.user.id;
     const result = await attendanceService.getAttendanceByUserId(userId);
-    res.status(200).json({ error: false, data: result });
+    res.status(200).json({
+      error: false,
+      message: 'Get my attendance successfully',
+      data: result
+    });
   } catch (err) {
-    res.status(400).json({ error: true, message: err.message });
+    res.status(400).json({
+      error: true,
+      message: err.message
+    });
   }
 };
 
 exports.getAllAttendance = async (req, res) => {
   try {
     const result = await attendanceService.getAllAttendance();
-    res.status(200).json({ error: false, data: result });
+    res.status(200).json({
+      error: false,
+      message: 'Get all attendance successfully',
+      data: result
+    });
   } catch (err) {
     res.status(400).json({ error: true, message: err.message });
   }
