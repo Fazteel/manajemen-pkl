@@ -1,4 +1,4 @@
-const { VacancySubmission, Vacancy } = require('../models/index');
+const { VacancySubmission, Vacancy, User } = require('../models/index');
 const { Op } = require('sequelize');
 
 exports.create = async (siswaId, lowonganId) => {
@@ -32,7 +32,19 @@ exports.getMe = async (siswaId) => {
 };
 
 exports.getAll = async () => {
-  const data = await VacancySubmission.findAll({ include: 'Vacancy' });
+  const data = await VacancySubmission.findAll({
+    include: [
+      {
+        model: Vacancy,
+        as: 'Vacancy'
+      },
+      {
+        model: User,
+        as: 'user',
+        attributes: ['id', 'name']
+      }
+    ]
+  });
   return data;
 };
 
