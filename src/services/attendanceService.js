@@ -39,6 +39,14 @@ const validateQr = async (qrData) => {
   }
 };
 
+exports.getLatestQrCode = async () => {
+  const latestQr = await QrCode.findOne({
+    order: [['createdAt', 'DESC']],
+  });
+
+  return latestQr;
+};
+
 exports.checkIn = async (userId, qrData, location) => {
   validateQr(qrData);
 
