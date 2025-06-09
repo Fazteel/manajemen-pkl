@@ -3,6 +3,12 @@ const { v4: uuidv4 } = require("uuid");
 const { Op } = require("sequelize");
 const { Attendance, QrCode, User } = require("../models/index");
 
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 exports.generateQr = async (userId) => {
   const secret = uuidv4();
 
@@ -41,7 +47,7 @@ const validateQr = async (qrData) => {
 
 exports.getLatestQrCode = async () => {
   const latestQr = await QrCode.findOne({
-    order: [['createdAt', 'DESC']],
+    order: [["createdAt", "DESC"]],
   });
 
   return latestQr;
@@ -55,13 +61,13 @@ exports.checkIn = async (userId, qrData, location) => {
   //     throw new Error("Lokasi tidak valid");
   //   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = dayjs().tz("Asia/Jakarta");
+  const todayDateString = now.format("YYYY-MM-DD");
 
   let absensi = await Attendance.findOne({
     where: {
       user_id: userId,
-      tanggal: today,
+      tanggal: todayDateString,
     },
   });
 
@@ -69,21 +75,22 @@ exports.checkIn = async (userId, qrData, location) => {
     throw new Error("Anda sudah melakukan check-in hari ini");
   }
 
+  const checkInTime = now.toDate();
   if (!absensi) {
     absensi = await Attendance.create({
       user_id: userId,
-      tanggal: today,
-      check_in: new Date(),
+      tanggal: todayDateString,
+      check_in: checkInTime,
       keterangan: "Hadir",
     });
   } else {
-    absensi.check_in = new Date();
+    absensi.check_in = checkInTime;
     await absensi.save();
   }
 
   return {
     tanggal: absensi.tanggal,
-    check_in: absensi.check_in,
+    check_in: dayjs(absensi.check_in).tz("Asia/Jakarta").format("HH:mm:ss"),
   };
 };
 
@@ -94,13 +101,13 @@ exports.checkOut = async (userId, qrData, location) => {
   //     throw new Error("Lokasi tidak valid");
   //   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = dayjs().tz("Asia/Jakarta");
+  const todayDateString = now.format("YYYY-MM-DD");
 
   const absensi = await Attendance.findOne({
     where: {
       user_id: userId,
-      tanggal: today,
+      tanggal: todayDateString,
     },
   });
 
@@ -112,13 +119,13 @@ exports.checkOut = async (userId, qrData, location) => {
     throw new Error("Anda sudah melakukan check-out hari ini");
   }
 
-  absensi.check_out = new Date();
+  absensi.check_out = now.toDate();
   await absensi.save();
 
   return {
-    tanggal: absensi.tanggal,
-    check_in: absensi.check_in,
-    check_out: absensi.check_out,
+      tanggal: absensi.tanggal,
+      check_in: dayjs(absensi.check_in).tz('Asia/Jakarta').format('HH:mm:ss'),
+      check_out: dayjs(absensi.check_out).tz('Asia/Jakarta').format('HH:mm:ss'),
   };
 };
 
@@ -149,25 +156,23 @@ exports.getAllAttendance = async () => {
 };
 
 exports.getTodaysLeaderboard = async () => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
 
   const leaderboardData = await Attendance.findAll({
     where: {
       tanggal: today,
-      keterangan: 'Hadir',
+      keterangan: "Hadir",
       check_in: {
-        [Op.ne]: null
-      }
+        [Op.ne]: null,
+      },
     },
     include: {
       model: User,
-      attributes: ['name'], 
-      required: true
+      attributes: ["name"],
+      required: true,
     },
-    order: [
-      ['check_in', 'ASC']
-    ],
-    attributes: ['id', 'check_in']
+    order: [["check_in", "ASC"]],
+    attributes: ["id", "check_in"],
   });
 
   return leaderboardData;

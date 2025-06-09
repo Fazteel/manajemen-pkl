@@ -62,7 +62,6 @@ exports.checkOut = async (req, res) => {
   try {
     const userId = req.user.id;
     const { qrData, location = {} } = req.body;
-    console.log(req.body);
     const result = await attendanceService.checkOut(userId, qrData, location);
     res.status(200).json({
       error: false,
