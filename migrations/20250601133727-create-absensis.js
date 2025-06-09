@@ -21,11 +21,11 @@ module.exports = {
         allowNull: false
       },
       check_in: {
-        type: Sequelize.TIME,
+        type: Sequelize.DATETIME,
         allowNull: true
       },
       check_out: {
-        type: Sequelize.TIME,
+        type: Sequelize.DATETIME,
         allowNull: true
       },
       keterangan: {
