@@ -40,7 +40,14 @@ exports.getOne = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const result = await vacancyService.create(req.body);
+    const payload = { ...req.body };
+
+    if (req.file) {
+      const imageUrl = `${req.protocol}://${req.get('host')}/public/uploads/${req.file.filename}`;
+      payload.gambar_url = imageUrl;
+    }
+    const result = await vacancyService.create(payload);
+    
     res.status(201).json({
       error: false,
       status: 201,
@@ -59,6 +66,11 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
+    const payload = { ...req.body };
+    if (req.file) {
+      const imageUrl = `${req.protocol}://${req.get('host')}/public/uploads/${req.file.filename}`;
+      payload.gambar_url = imageUrl;
+    }
     const result = await vacancyService.update(req.params.id, req.body);
     res.status(200).json({
       error: false,

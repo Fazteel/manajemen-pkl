@@ -13,11 +13,17 @@ exports.authenticate = (req, res, next) => {
   }
 };
 
-exports.checkRole = (role) => {
-    return (req, res, next) => {
-        if (!req.user || req.user.role !== role) {
-            return res.status(403).json({ message: 'Forbidden: Insufficient role' })
-        }
-        next();
-    };
+exports.checkRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ message: "Autentikasi gagal" });
+    }
+
+    const userRole = req.user.role;
+    if (!allowedRoles.includes(userRole)) {
+      return res.status(403).json({ message: 'Akses terlarang: Anda tidak memiliki hak akses yang cukup.' });
+    }
+
+    next();
+  };
 };
