@@ -71,7 +71,7 @@ exports.update = async (req, res) => {
       const imageUrl = `${req.protocol}://${req.get('host')}/public/uploads/${req.file.filename}`;
       payload.gambar_url = imageUrl;
     }
-    const result = await vacancyService.update(req.params.id, req.body);
+    const result = await vacancyService.update(req.params.id, payload);
     res.status(200).json({
       error: false,
       status: 200,
