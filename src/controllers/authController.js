@@ -100,15 +100,15 @@ exports.resendSetPassword = async (req, res) => {
   }
 };
 
-exports.forgotPassword = async (req, res) => {
+exports.requestPasswordReset = async (req, res) => {
   try {
-    await authService.forgotPassword(req.body.email);
+    await authService.requestPasswordReset(req.body.email);
     res.status(200).json({
       error: false,
       status: 200,
-      message: "OK - OTP sent",
+      message: "OK - OTP untuk reset password telah dikirim",
       data: {
-        message: "OTP sent to your email"
+        message: "Silakan periksa email Anda untuk kode OTP."
       }
     });
   } catch (err) {
@@ -149,6 +149,27 @@ exports.resetPassword = async (req, res) => {
       status: 400,
       message: "Bad Request - " + err.message,
       data: null
+    });
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id; 
+    const { currentPassword, newPassword } = req.body;
+
+    await authService.changeUserPassword(userId, currentPassword, newPassword);
+    
+    res.status(200).json({
+      error: false,
+      status: 200,
+      message: "OK - Password berhasil diubah",
+    });
+  } catch (err) {
+    res.status(400).json({
+      error: true,
+      status: 400,
+      message: "Bad Request - " + err.message,
     });
   }
 };

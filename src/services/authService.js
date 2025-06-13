@@ -79,16 +79,42 @@ exports.verifyOtpStep = async ({ email, otp }) => {
   await redis.set(`verified:${email}`, 'true', { EX: 600 });
 };
 
-exports.resetPassword = async ({ email, newPassword }) => {
+exports.requestPasswordReset = async (email) => {
+  if (!email) throw new Error('Email diperlukan');
+
+  const user = await User.findOne({ where: { email } });
+  if (!user) throw new Error('Email tidak terdaftar');
+
+  const otp = generateOtp();
   const redis = await getRedisClient();
-  const verified = await redis.get(`verified:${email}`);
-  if (!verified) throw new Error('OTP not verified for this email');
 
-  const hashed = await bcrypt.hash(newPassword, 10);
-  await User.update({ password: hashed }, { where: { email } });
+  await redis.set(`reset-otp:${email}`, otp, { EX: 300 });
 
-  await redis.del(`otp:${email}`);
-  await redis.del(`verified:${email}`);
+  await sendOtpEmail(email, otp); 
+  console.log(`[DEBUG] Reset OTP for ${email}: ${otp}`);
+};
+
+
+exports.changeUserPassword = async (userId, currentPassword, newPassword) => {
+  if (!currentPassword || !newPassword) {
+    throw new Error('Password lama dan password baru diperlukan');
+  }
+  if (currentPassword === newPassword) {
+    throw new Error('Password baru tidak boleh sama dengan password lama');
+  }
+  
+  const user = await User.findByPk(userId);
+  if (!user) throw new Error('User tidak ditemukan');
+  
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    throw new Error('Password lama yang Anda masukkan salah');
+  }
+  
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await user.update({ password: hashedPassword });
+  
+  // await sendPasswordChangeNotification(user.email);
 };
 
 exports.logout = async (req) => {
