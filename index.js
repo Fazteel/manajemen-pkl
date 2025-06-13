@@ -8,6 +8,7 @@ const userRoute = require("./src/routes/userRoute");
 const attendanceRoutes = require("./src/routes/attendanceRoute");
 const vacancyRoute = require("./src/routes/vacancyRoute");
 const submissionRoute = require("./src/routes/submissionRoute");
+const announcementRoutes = require('./src/routes/announcementRoute');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api", userRoute);
 app.use("/api", attendanceRoutes);
 app.use("/api", vacancyRoute);
 app.use("/api", submissionRoute);
+app.use('/api', announcementRoutes);
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const PORT = process.env.PORT || 3000;
